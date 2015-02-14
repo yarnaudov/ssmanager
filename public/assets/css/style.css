@@ -1,0 +1,96 @@
+body {
+    color: #666666;
+}
+a{
+    color: #428BCA;
+}
+a:hover{
+    color: #428BCA;
+}
+header{
+    border-bottom: 2px solid #428BCA;
+    padding-bottom: 2px;
+    background: #E6E3D4;
+    background-image: -moz-linear-gradient(center top , #ffffff, #E6E3D4);
+    background-repeat: repeat-x;
+    box-shadow: 0px 0px 10px #888888;
+}
+header .right{
+    text-align: right;
+    margin-top: 8px;
+}
+header .right .username{
+    border-right: 1px solid #883ced;
+    padding-right: 4px;
+}
+
+footer{
+    border-top: 1px solid #ddd;
+    padding-top: 10px;
+}
+
+#content{
+    margin: 15px 0;
+}
+#logo{
+    font-size: 26px;
+    line-height: 36px;
+}
+
+.nav > li > a {
+    outline: 0 none;
+    padding: 4px 6px;
+}
+.tab-content{
+    padding-top: 15px;
+}
+
+/* sticky footer */
+html, body {
+	height: 100%;
+}
+.wrapper {
+	min-height: 100%;
+	margin: 0 auto -45px; /* the bottom margin is the negative value of the footer's height */
+}
+footer, .push {
+	height: 45px; /* '.push' must be the same height as 'footer' */
+}
+
+.alert {
+    padding: 5px 30px 5px 10px;
+}
+.alert-error {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+}
+.alert-error hr {
+  border-top-color: #e4b9c0;
+}
+.alert-error .alert-link {
+  color: #843534;
+}
+
+.modal-header{
+    background-image: -moz-linear-gradient(center top , #ffffff, #E6E3D4);
+    background-repeat: repeat-x;
+    box-shadow: 0px 0px 10px #888888;
+    border-radius: 6px 6px 0 0;
+    padding: 8px 15px 5px;
+}
+.modal-footer{
+    padding: 10px;
+}
+.modal p.text-danger{
+    margin: 0;
+}
+
+.loading{
+    background-image: url('../img/loading.png');
+    background-repeat: no-repeat;
+    background-position: center;
+}
+input.loading{
+    background-position: 5px center;
+}
