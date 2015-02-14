@@ -21,9 +21,7 @@ class Controller_Main extends \Controller_Main
 	
 	public function action_index()
 	{
-		
-		//Asset::add_path('assets/console');
-		
+				
 		$asset = Asset::forge('console', array('paths' => array('assets/console'), 'auto_render' => false));
 		$asset->js('scripts.js');
 		$asset->js('http://ace.c9.io/build/src-min-noconflict/ace.js');
@@ -36,7 +34,7 @@ class Controller_Main extends \Controller_Main
 	public function action_exec()
 	{
 		
-		$cmd = trim($_POST['cmd']);
+		$cmd = trim(\Input::post('cmd', true));
 		$shell = new \Shell();
 		$cmd_output = $shell->exec($cmd);
 		
@@ -53,8 +51,8 @@ class Controller_Main extends \Controller_Main
 	public function action_savefile()
 	{
 		
-		$file = trim($_POST['file']);
-		$data = $_POST['data'];
+		$file = trim(\Input::post('file'));
+		$data = \Input::post('data');
 		
 		if(is_writable($file)){
 			echo file_put_contents($file, $data);
