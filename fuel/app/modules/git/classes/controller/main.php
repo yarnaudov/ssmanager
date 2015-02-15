@@ -19,6 +19,7 @@ class Controller_Main extends \Controller_Main {
 
         $this->shell = new \Shell();
         $this->shell->save_wd = false;
+        \Config::load('git::config');
     }
 
     public function action_index() {
@@ -31,10 +32,10 @@ class Controller_Main extends \Controller_Main {
     }
 
     public function action_repositories() {
-     
-        echo DOCROOT;
+
+        $projects_dir = realpath(\Config::get('projects_dir'));
         
-        $git_projects = $this->shell->exec('cd ~;find ./ -type d -name ".git";');
+        $git_projects = $this->shell->exec('cd ' . $projects_dir . ';find ./ -type d -name ".git";');
         $git_projects = explode("/.git", $git_projects);
 
         $git_projects_texts = $git_projects = array_reverse($git_projects);

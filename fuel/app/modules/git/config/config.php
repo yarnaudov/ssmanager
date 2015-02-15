@@ -22,8 +22,8 @@
 
 return array(
 
-	'title' => 'GIT',
-	
+    'title' => 'GIT',
+    'projects_dir' => DOCROOT . '../../'    
 
 );
 
