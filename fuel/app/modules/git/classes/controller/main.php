@@ -31,6 +31,8 @@ class Controller_Main extends \Controller_Main {
     }
 
     public function action_repositories() {
+     
+        echo DOCROOT;
         
         $git_projects = $this->shell->exec('cd ~;find ./ -type d -name ".git";');
         $git_projects = explode("/.git", $git_projects);
