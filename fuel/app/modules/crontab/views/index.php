@@ -39,7 +39,7 @@
 
 <div class="row" >
 	<div class="col-md-12" >
-		<button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#addCronJobModal" ><i class="glyphicon glyphicon-plus" ></i> Add new cronjob</button>
+		<button class="btn btn-sm btn-primary add-job" data-toggle="modal" data-target="#addEditCronJobModal" ><i class="glyphicon glyphicon-plus" ></i> Add new cronjob</button>
 	</div>
 </div>
 
@@ -53,8 +53,8 @@
 		<td>{{weekday}}</td>
 		<td>{{command}}</td>
 		<td>
-			<a href="#" ><i class="glyphicon glyphicon-pencil" ></i></a> 
-			<a href="#" ><i class="glyphicon glyphicon-trash" ></i></a> 
+			<a href="#" data-toggle="modal" data-target="#addEditCronJobModal" class="edit-job" ><i class="glyphicon glyphicon-pencil" ></i></a> 
+			<a href="#" data-toggle="modal" data-target="#deleteCronJobModal" class="delete-job" ><i class="glyphicon glyphicon-trash" ></i></a> 
 		</td>
 	</tr>
 </script>
@@ -66,11 +66,14 @@
 </script>
 
 
-<div class="modal fade" id="addCronJobModal" >
+<div class="modal fade" id="addEditCronJobModal" >
 	<div class="modal-dialog">
 		<div class="modal-content">
 			
 			<form class="form-horizontal" method="post" >
+				
+				<input type="hidden" name="job" >
+				
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 					<h4 class="modal-title">Add Cron job</h4>
@@ -330,6 +333,30 @@
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-primary">Add</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="deleteCronJobModal" >
+	<div class="modal-dialog">
+		<div class="modal-content">
+			
+			<form class="form-horizontal" method="post" >
+				
+				<input type="hidden" name="job" >
+				
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title">Delete Cron job</h4>
+				</div>
+				<div class="modal-body">
+					<p>Are you sure you want to delete this cronjob?</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary">Yes delete it</button>
 					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 				</div>
 			</form>

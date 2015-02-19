@@ -25,10 +25,7 @@ class Controller_Main extends \Controller_Main
 		$asset = Asset::forge('crontab', array('paths' => array('assets/crontab'), 'auto_render' => false));
 		$asset->js('scripts.js');
 		$asset->css('style.css');
-				
-		
-		
-		
+
 		return Response::forge(View::forge('index'));
 		
 	}
@@ -36,6 +33,7 @@ class Controller_Main extends \Controller_Main
 	public function action_jobs(){
 		
 		$jobs = $this->shell->exec('crontab -l');
+		//echo $jobs . "<-------<br>";
 		$jobs = explode(PHP_EOL, $jobs);
 				
 		$jobsArr = array();
@@ -48,27 +46,21 @@ class Controller_Main extends \Controller_Main
 			}
 			
 			$job = explode(" ", $job);
-			$jobArr = array(
-				'min' => $job[0],
-				'hour' => $job[1],
-				'day' => $job[2],
-				'month' => $job[3],
-				'weekday' => $job[4],
-			);
-			unset($job[0], $job[1], $job[2], $job[3], $job[4]);
+			if(count($job) >= 5){
 			
-			$command = implode(' ', $job);
-			//$command = explode(' > ', $command);
-			
-			$jobArr['command'] = $command;
-			//if(isset($command[1])){
-			//	$jobArr['log'] = $command[1];
-			//}
-			//else{
-			//	$jobArr['log'] = '';
-			//}
-						
-			$jobsArr['jobs'][] = $jobArr;
+				$jobArr = array(
+					'min' => $job[0],
+					'hour' => $job[1],
+					'day' => $job[2],
+					'month' => $job[3],
+					'weekday' => $job[4],
+				);
+				unset($job[0], $job[1], $job[2], $job[3], $job[4]);
+
+				$jobArr['command'] = implode(' ', $job);
+				
+				$jobsArr['jobs'][] = $jobArr;
+			}
 			
 		}
 		
@@ -78,26 +70,25 @@ class Controller_Main extends \Controller_Main
 	public function action_save(){
 		
 		$data = \Input::post('data');
-		 		 
-		$crontab = 'MAILTO="' . $data['mailto'] . '"' . PHP_EOL;
+		$crontab = '';
 		
-		foreach($data['jobs'] as $job){
-			 
-			$crontab .= implode(" ", $job) . PHP_EOL;
-			 			 
+		if(isset($data['mailto']) && !empty($data['mailto'])){
+			$crontab .= 'MAILTO="' . $data['mailto'] . '"' . PHP_EOL;
 		}
 		
-		$tmpfname = tempnam(sys_get_temp_dir(), 'CRON');
-		//echo $tmpfname;
-			
+		if(isset($data['jobs'])){
+			foreach($data['jobs'] as $job){
+				$crontab .= implode(" ", $job) . PHP_EOL;
+			}
+		}
+		
+		$tmpfname = tempnam(sys_get_temp_dir(), 'CRON');	
 		if(is_writable($tmpfname)){
 			file_put_contents($tmpfname, $crontab);
 		}
 		
-		 //echo $crontab;
-		echo $this->shell->exec('crontab ' . $tmpfname);
-		 
-		
+		echo json_encode(array('result' => $this->shell->exec('crontab ' . $tmpfname)));
+		 		
 	}
 	
 }
