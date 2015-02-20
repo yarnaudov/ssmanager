@@ -47,6 +47,12 @@ var crontab = function(){
 			self._saveMail($('[name="email"]').val());
 		});
 		
+		$('#crontab').on('click', '.add-job', function(e){
+			e.preventDefault();
+			$('#addEditCronJobModal .modal-title').html('Add Cron job');
+			$('#addEditCronJobModal .btn-primary').html('Add');
+		});
+		
 		$('#crontab').on('click', '.edit-job', function(e){
 			e.preventDefault();
 			
@@ -54,6 +60,9 @@ var crontab = function(){
 			if(typeof self.crontab.jobs[index] !== 'undefined'){
 				self._editJob(index);
 			}
+			
+			$('#addEditCronJobModal .modal-title').html('Change Cron job');
+			$('#addEditCronJobModal .btn-primary').html('Change');
 			
 		});
 		

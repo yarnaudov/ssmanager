@@ -330,7 +330,7 @@ $(function(){
 	// automaticaly resize output conteiner
 	$(window).on('resize load', function() {
 	
-		var output_height = $(window).height() - $('.header').height() - $('.modules').height() - 225;		
+		var output_height = $(window).height() - $('.header').height() - $('.modules').height() - 195;		
 		$(commandObj.output_container).css('height', output_height);
 
 		$(commandObj.editor_modal).find('.modal-body .tab-content').height($(window).height()-170);
