@@ -361,8 +361,15 @@ var command = function(){
 		}
 		else{
 			
-			var editor_id = $(this.editor_modal).find('.modal-body .nav').find('li[data-file="' + file + '"] a').attr('href').replace('#', '');
-			this.editors[editor_id].env.document.setValue(data);
+			var result = true;
+			if(show_editor){
+				result = confirm("This file is already opened. Do you want to refresh file content?");
+			}
+			
+			if(result){
+				var editor_id = $(this.editor_modal).find('.modal-body .nav').find('li[data-file="' + file + '"] a').attr('href').replace('#', '');
+				this.editors[editor_id].setValue(data);
+			}
 			
 		}
 		
