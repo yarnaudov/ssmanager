@@ -1,5 +1,4 @@
 var wd;
-var editors = [];
 
 function str_pad(input, length, string) {
     string = string || '0'; input = input + '';
@@ -8,6 +7,8 @@ function str_pad(input, length, string) {
 
 	
 var command = function(){
+	
+	this.editors = [];
 		
 	this.output_container = '#console-output';
 	this.history_dropdown = '#console-commands-history';
@@ -107,6 +108,84 @@ var command = function(){
 			else{
 				var cmd = 'cd ' + $(this).parents('p').data('wd') + '/' + $(this).html() + ';ls -l';
 			}
+			self.exec(cmd);
+		});
+		
+		// save file
+		$(document).on('click', '.saveFileBtn', function(){
+
+			var message = $(self.editor_modal).find('.message');
+			var active = $(self.editor_modal).find(' .modal-body .nav .active');	
+
+			var file = $(active).data('file');			
+			var editor_id = $(active).find('a').attr('href').replace('#', '');
+			var data = self.editors[editor_id].getValue();
+
+			$(message).html('');
+
+			$.post(site_url + 'console/savefile', {file: file, data: data}, function(data){
+
+				if(data === 'no-permission'){
+					$(message).html('<span class="alert alert-danger" >You do not have permission to write in this file</span>');
+				}	
+				else if(data > 0){
+					$(message).html('<span class="alert alert-success" >File successfully saved!</span>');					
+				}
+				else{
+					$(message).html('<span class="alert alert-danger" >File could not be saved!</span>');						
+				}
+
+				setTimeout(function(){
+					$(message).html('');
+				}, 2000);
+
+			});
+
+		});
+		
+		// close file tab
+		$(this.editor_modal).find('.nav').on('click', '.close', function(){
+
+			var tab = $(this).parents('li');
+			var editor_id = $(this).parents('a').attr('href').replace('#', '');
+			var file = $(this).parents('a').attr('title');
+
+			var was_active = tab.hasClass('active');
+			tab.remove();
+
+			if(was_active){
+				if($(self.editor_modal).find('.nav li').length === 0){
+					$(self.editor_modal).modal('hide');
+				}
+				else{
+					$(self.editor_modal).find('.nav a:first').tab('show');
+				}
+			}
+
+			$('#' + editor_id).remove();
+			delete self.editors[editor_id];
+
+			// remove from open files
+			$.each(self.open_files, function(index, open_file){
+				if(open_file === file){
+					self.open_files.splice(index, 1);
+				}
+			});
+
+			if(typeof(Storage) !== "undefined") {
+				localStorage.setItem("open_files", JSON.stringify(self.open_files));
+			}
+
+			if($(self.editor_modal).find('.nav li').length === 0){
+				$('#console-opened-files').attr('disabled', true);
+			}
+
+		});
+	
+		// refresh file
+		$(this.editor_modal).find('.nav').on('dblclick', '.active a', function() {
+			var file = $(this).closest('li').data('file');	
+			var cmd = 'cat ' + file;
 			self.exec(cmd);
 		});
 				
@@ -237,11 +316,18 @@ var command = function(){
 		// check if file is already open
 		if($(this.editor_modal).find('.modal-body .nav').find('li[data-file="' + file + '"]').length == 0){
 			
-			var editor_id = 'editor' + $(this.editor_modal).find('.modal-body .tab-content').find('.editor').length;
+			var editor_index = 0;
 			
-			$(this.editor_modal).find('.modal-body .nav').append('<li data-file="' + file + '" ><a href="#' + editor_id + '" title="' + file + '" role="tab" data-toggle="tab" >' + filename + '<button type="button" class="close" ><span aria-hidden="true">&times;</span></button></a></li>');
-			$(this.editor_modal).find('.modal-body .tab-content').append('<div id="' + editor_id + '" class="tab-pane editor" ></div>');
-			$(this.editor_modal).find('.modal-body .tab-content #' + editor_id).text(data).html();
+			var editors = $(this.editor_modal).find('.modal-body .tab-content').find('.editor');
+			if(editors.length > 0){
+				editor_index = editors.last().data('index')+1;
+			}
+			
+			var editor_id = 'editor' + editor_index;
+			
+			$(this.editor_modal).find('.modal-body .nav').append('<li data-file="' + file + '" ><a href="#' + editor_id + '"  title="' + file + '" role="tab" data-toggle="tab" >' + filename + '<span class="close" aria-hidden="true">&times;</span></a></li>');
+			$(this.editor_modal).find('.modal-body .tab-content').append('<div id="' + editor_id + '" data-index="' + editor_index + '" class="tab-pane editor" ></div>');
+			$(this.editor_modal).find('.modal-body .tab-content #' + editor_id).text(data);
 	
 			var editor = ace.edit(editor_id);
 			editor.setTheme('ace/theme/monokai');
@@ -262,7 +348,7 @@ var command = function(){
 			if(mode === 'js'){ mode = 'javascript'; }                        
 			editor.getSession().setMode('ace/mode/'+mode);
 			
-			editors[editor_id] = editor;
+			this.editors[editor_id] = editor;
 
 			if($.inArray(file, this.open_files) === -1){
 				this.open_files.push(file);
@@ -272,6 +358,12 @@ var command = function(){
 				localStorage.setItem("open_files", JSON.stringify(this.open_files));
 			}
 
+		}
+		else{
+			
+			var editor_id = $(this.editor_modal).find('.modal-body .nav').find('li[data-file="' + file + '"] a').attr('href').replace('#', '');
+			this.editors[editor_id].env.document.setValue(data);
+			
 		}
 		
 		$(this.editor_modal).find('.modal-body .nav li').removeClass('active');
@@ -335,76 +427,6 @@ $(function(){
 
 		$(commandObj.editor_modal).find('.modal-body .tab-content').height($(window).height()-170);
 
-	});
-	
-	// save file
-	$(document).on('click', '.saveFileBtn', function(){
-		
-		var message = $(commandObj.editor_modal).find('.message');
-		var active = $(commandObj.editor_modal).find(' .modal-body .nav .active');	
-		
-		var file = $(active).data('file');			
-		var editor_id = $(active).find('a').attr('href').replace('#', '');
-		var data = editors[editor_id].getValue();
-
-		$(message).html('');
-		
-		$.post(site_url + 'console/savefile', {file: file, data: data}, function(data){
-
-			if(data === 'no-permission'){
-				$(message).html('<span class="alert alert-danger" >You do not have permission to write in this file</span>');
-			}	
-			else if(data > 0){
-				$(message).html('<span class="alert alert-success" >File successfully saved!</span>');					
-			}
-			else{
-				$(message).html('<span class="alert alert-danger" >File could not be saved!</span>');						
-			}
-			
-			setTimeout(function(){
-				$(message).html('');
-			}, 2000);
-			
-		});
-		
-	});
-
-	// close file tab
-	$(commandObj.editor_modal).find('.nav').on('click', '.close', function(){
-		
-		var tab = $(this).parents('li');
-		var editor_id = $(this).parents('a').attr('href').replace('#', '');
-		var file = $(this).parents('a').attr('title');
-		
-		var was_active = tab.hasClass('active');
-		tab.remove();
-		
-		if(was_active){
-			if($(commandObj.editor_modal).find('.nav li').length === 0){
-				$(commandObj.editor_modal).modal('hide');
-			}
-			else{
-				$(commandObj.editor_modal).find('.nav a:first').tab('show');
-			}
-		}
-				
-		$('#' + editor_id).remove();
-		
-		// remove from open files
-		$.each(commandObj.open_files, function(index, open_file){
-			if(open_file === file){
-				commandObj.open_files.splice(index, 1);
-			}
-		});
-		
-		if(typeof(Storage) !== "undefined") {
-			localStorage.setItem("open_files", JSON.stringify(commandObj.open_files));
-		}
-			
-		if($(commandObj.editor_modal).find('.nav li').length === 0){
-			$('#console-opened-files').attr('disabled', true);
-		}
-		
 	});
 	
 	// find console tab and attach object reference to the dom
