@@ -73,7 +73,10 @@ var App = function () {
                 $('#username').html(data.user.username);
                 $('#log-in-modal').modal('hide');
                 var myObj = $.data($('.nav.modules .active a').get(0), 'myobj');
-                myObj.init();
+                if (myObj.inited !== true) {
+                    myObj.init();
+                    myObj.inited = true;
+                }
             }
         }, 'json');
 
